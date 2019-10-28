@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -14,7 +15,7 @@ var sh *shell.Shell
 type Schema struct {
 	Subject   string
 	Predicate string
-	Value     int64
+	Value     int
 }
 
 func main() {
@@ -22,8 +23,26 @@ func main() {
 	// Where your local node is running on localhost:5001
 	sh = shell.NewShell("localhost:5001")
 
+	fmt.Println("MMMMMMMMMMMMMMWX0kdlldk0XWMMMMMMMMMMMMMM\nMMMMMMMMMMWNKOxdoddooddodxOKNWMMMMMMMMMM\nMMMMMMMWX0kxdoddddddddddddodxk0XWMMMMMMM\nMMMWNKOxdoddddddddddddddddddddodxOKNWMMM\nMWKkdooddddddddddddddddddddddddddoodkKWM\nMNxcllloddddddddddddddddddddddddolllcxNM\nMNxooollllooddddddddddddddddoolllloooxNM\nMNxoddddoolllloodddddddddollllooddddoxNM\nMNxoddddddddolllllllllllllloddddddddoxNM\nMNxodddddddddddolcccccclodddddddddddoxNM\nMNxoddddddddddddolccccloddddddddddddoxNM\nMNxoddddddddddddddlcclddddddddddddddoxNM\nMNxoddddddddddddddoccoddddddddddddddoxNM\nMNxlodddddddddddddoccodddddddddddddolxNM\nMNklloddddddddddddoccoddddddddddddollkNM\nMMWX0kddddddddddddoccoddddddddddddk0XNMM\nMMMMMWN0OxdoddddddoccoddddddodxOKNWMMMMM\nMMMMMMMMWNXOkdodddoccodddodkOXNMMMMMMMMM\nMMMMMMMMMMMMWX0OxolccloxO0XWMMMMMMMMMMMM\nMMMMMMMMMMMMMMMWN0dlld0NWMMMMMMMMMMMMMMM\n")
+
+	fmt.Println("### ######  #######  #####  \n #  #     # #       #     # \n #  #     # #       #       \n #  ######  #####    #####  \n #  #       #             # \n #  #       #       #     # \n### #       #        #####  \n")
+
+	fmt.Println("###########################\n   Welcome to IPLD-CRUD!\n###########################\n")
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter the value for Subject field: ")
+	subject, _ := reader.ReadString('\n')
+
+	fmt.Println("Enter the value for Predicate field: ")
+	predicate, _ := reader.ReadString('\n')
+
+	fmt.Println("Enter the value for Value field: ")
+	var value int
+	_, err := fmt.Scan(&value)
+
 	// Creating an entry as per the definition of struct. New struct, new schema!
-	entry := Schema{"IPFS", "is awesome!", 007}
+	// entry := Schema{"IPFS", "is awesome!", 007}
+	entry := Schema{subject, predicate, value}
 
 	// Converting into JSON object
 	entryJSON, err := json.Marshal(entry)
@@ -34,10 +53,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error: %s", err)
 		os.Exit(1)
 	}
-	fmt.Printf("\nWRITE: Added %sIPLD EXPLORER LINK: https://explore.ipld.io/#/explore/%s", string(cid+"\n"), string(cid+"\n"))
+	fmt.Println("------\nOUTPUT\n------")
+	fmt.Printf("WRITE: Successfully added %sHere's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"), string(cid+"\n"))
 
 	// Fetch the details by reading the DAG for key "Subject"
-	fmt.Println("\nREAD: Value for key \"Subject\": ")
+	fmt.Println("READ: Value for key \"Subject\": ")
 	res, err := GetDag(cid, "Subject")
 	if err != nil {
 		fmt.Println(err)
@@ -45,7 +65,7 @@ func main() {
 	fmt.Println(res)
 
 	// Fetch the details by reading the DAG for key "Predicate"
-	fmt.Println("\nREAD: Value for key \"Predicate\": ")
+	fmt.Println("READ: Value for key \"Predicate\": ")
 	res, err = GetDag(cid, "Predicate")
 	if err != nil {
 		fmt.Println(err)
@@ -53,7 +73,7 @@ func main() {
 	fmt.Println(res)
 
 	// Fetch the details by reading the DAG for key "Value"
-	fmt.Println("\nREAD: Value for key \"Value\": ")
+	fmt.Println("READ: Value for key \"Value\": ")
 	res, err = GetDag(cid, "Value")
 	if err != nil {
 		fmt.Println(err)
