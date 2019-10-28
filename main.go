@@ -23,7 +23,7 @@ func main() {
 	sh = shell.NewShell("localhost:5001")
 
 	// Creating an entry as per the definition of struct. New struct, new schema!
-	entry := Schema{"IPFS", "is awesome!", 01}
+	entry := Schema{"IPFS", "is awesome!", 007}
 
 	// Converting into JSON object
 	entryJSON, err := json.Marshal(entry)
@@ -34,10 +34,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error: %s", err)
 		os.Exit(1)
 	}
-	fmt.Printf("WRITE: Added %s", string(cid+"\n"))
+	fmt.Printf("\nWRITE: Added %sIPLD EXPLORER LINK: https://explore.ipld.io/#/explore/%s", string(cid+"\n"), string(cid+"\n"))
 
 	// Fetch the details by reading the DAG for key "Subject"
-	fmt.Println("READ: Value for key \"Subject\": ")
+	fmt.Println("\nREAD: Value for key \"Subject\": ")
 	res, err := GetDag(cid, "Subject")
 	if err != nil {
 		fmt.Println(err)
@@ -45,7 +45,7 @@ func main() {
 	fmt.Println(res)
 
 	// Fetch the details by reading the DAG for key "Predicate"
-	fmt.Println("READ: Value for key \"Predicate\": ")
+	fmt.Println("\nREAD: Value for key \"Predicate\": ")
 	res, err = GetDag(cid, "Predicate")
 	if err != nil {
 		fmt.Println(err)
@@ -53,7 +53,7 @@ func main() {
 	fmt.Println(res)
 
 	// Fetch the details by reading the DAG for key "Value"
-	fmt.Println("READ: Value for key \"Value\": ")
+	fmt.Println("\nREAD: Value for key \"Value\": ")
 	res, err = GetDag(cid, "Value")
 	if err != nil {
 		fmt.Println(err)
