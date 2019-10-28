@@ -10,6 +10,7 @@ import (
 
 var sh *shell.Shell
 
+// Schema is a sample definition of how you could create schemas/models around DAG entries
 type Schema struct {
 	Subject   string
 	Predicate string
@@ -17,24 +18,25 @@ type Schema struct {
 }
 
 func main() {
+
 	// Where your local node is running on localhost:5001
 	sh = shell.NewShell("localhost:5001")
-	// sh.DagPut(`, "json", "cbor")
+
+	// Creating an entry as per the definition of struct. New struct, new schema!
 	entry := Schema{"IPFS", "is awesome!", 01}
 
+	// Converting into JSON object
 	entryJSON, err := json.Marshal(entry)
 
-	// cid, err := sh.DagPut(`{"x": "I","y": "<3", "z": "IPFS"}`, "json", "cbor")
+	// Dag PUT operation which will return the CID for futher access or pinning etc.
 	cid, err := sh.DagPut(entryJSON, "json", "cbor")
-
-	// cid, err := sh.Add(strings.NewReader("hello world!"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %s", err)
 		os.Exit(1)
 	}
 	fmt.Printf("WRITE: Added %s", string(cid+"\n"))
 
-	// Fetch the details by reading the DAG for key "x"
+	// Fetch the details by reading the DAG for key "Subject"
 	fmt.Println("READ: Value for key \"Subject\": ")
 	res, err := GetDag(cid, "Subject")
 	if err != nil {
@@ -42,7 +44,7 @@ func main() {
 	}
 	fmt.Println(res)
 
-	// Fetch the details by reading the DAG for key "y"
+	// Fetch the details by reading the DAG for key "Predicate"
 	fmt.Println("READ: Value for key \"Predicate\": ")
 	res, err = GetDag(cid, "Predicate")
 	if err != nil {
@@ -50,7 +52,7 @@ func main() {
 	}
 	fmt.Println(res)
 
-	// Fetch the details by reading the DAG for key "z"
+	// Fetch the details by reading the DAG for key "Value"
 	fmt.Println("READ: Value for key \"Value\": ")
 	res, err = GetDag(cid, "Value")
 	if err != nil {
@@ -59,6 +61,7 @@ func main() {
 	fmt.Println(res)
 }
 
+// GetDag handles READ operations of a DAG entry by CID, returning the corresponding value
 func GetDag(ref, key string) (out interface{}, err error) {
 	err = sh.DagGet(ref+"/"+key, &out)
 	return
