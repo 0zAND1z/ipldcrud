@@ -9,14 +9,8 @@ import (
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
+// Global variable to handle all the IPFS API client calls
 var sh *shell.Shell
-
-// Schema is a sample definition of how you could create schemas/models around DAG entries
-type Schema struct {
-	Subject   string
-	Predicate string
-	Value     int
-}
 
 func main() {
 
@@ -28,24 +22,33 @@ func main() {
 	fmt.Println("### ######  #######  #####  \n #  #     # #       #     # \n #  #     # #       #       \n #  ######  #####    #####  \n #  #       #             # \n #  #       #       #     # \n### #       #        #####  \n")
 
 	fmt.Println("###########################\n   Welcome to IPLD-CRUD!\n###########################\n")
+	fmt.Println("This client generates a dynamic key-value entry and stores it in IPFS!\n")
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter the value for Subject field: ")
-	subject, _ := reader.ReadString('\n')
+	// Map structure to record key-value information
+	m := make(map[string]interface{})
 
-	fmt.Println("Enter the value for Predicate field: ")
-	predicate, _ := reader.ReadString('\n')
+	scanner := bufio.NewScanner(os.Stdin)
 
-	fmt.Println("Enter the value for Value field: ")
-	var value int
-	_, err := fmt.Scan(&value)
+	fmt.Println("Enter value for the key field: ")
+	scanner.Scan()
+	inputKey := scanner.Text()
 
-	// Creating an entry as per the definition of struct. New struct, new schema!
-	// entry := Schema{"IPFS", "is awesome!", 007}
-	entry := Schema{subject, predicate, value}
+	fmt.Println("Enter value for value field: ")
+	scanner.Scan()
+	inputValue := scanner.Text()
+
+	m[inputKey] = inputValue
 
 	// Converting into JSON object
-	entryJSON, err := json.Marshal(entry)
+	entryJSON, err := json.Marshal(m)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Display the marshaled JSON object before sending it to IPFS
+	jsonStr := string(entryJSON)
+	fmt.Println("The JSON object of your key-value entry is:")
+	fmt.Println(jsonStr)
 
 	// Dag PUT operation which will return the CID for futher access or pinning etc.
 	cid, err := sh.DagPut(entryJSON, "json", "cbor")
@@ -56,29 +59,14 @@ func main() {
 	fmt.Println("------\nOUTPUT\n------")
 	fmt.Printf("WRITE: Successfully added %sHere's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"), string(cid+"\n"))
 
-	// Fetch the details by reading the DAG for key "Subject"
-	fmt.Println("READ: Value for key \"Subject\": ")
-	res, err := GetDag(cid, "Subject")
+	// Fetch the details by reading the DAG for key "inputKey"
+	fmt.Printf("READ: Value for key \"%s\" is: ", inputKey)
+	res, err := GetDag(cid, inputKey)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(res)
 
-	// Fetch the details by reading the DAG for key "Predicate"
-	fmt.Println("READ: Value for key \"Predicate\": ")
-	res, err = GetDag(cid, "Predicate")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(res)
-
-	// Fetch the details by reading the DAG for key "Value"
-	fmt.Println("READ: Value for key \"Value\": ")
-	res, err = GetDag(cid, "Value")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(res)
 }
 
 // GetDag handles READ operations of a DAG entry by CID, returning the corresponding value
