@@ -86,6 +86,26 @@ func updateMapping(_structID, _CID string) {
 	}
 	fmt.Println("------\nOUTPUT\n------")
 	fmt.Printf("WRITE: Successfully added the mapping as well. Here's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"))
+
+	// Fetch the details by ID
+	fmt.Printf("READ: Value for key \"%s\" is: ", _structID)
+	res, err := GetDag(cid, _structID)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(res)
+	cidofcid := fmt.Sprintf("%v", res)
+	queryDAG(cidofcid, "Value")
+}
+
+func queryDAG(_CID, _queryString string) {
+	// Fetch the details of the data from the calculated hash
+	res, err := GetDag(_CID, _queryString)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("QUERY RESULT: ")
+	fmt.Println(res)
 }
 
 func main() {
