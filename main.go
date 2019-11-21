@@ -12,35 +12,30 @@ import (
 // Global variable to handle all the IPFS API client calls
 var sh *shell.Shell
 
-func main() {
+type SampleStruct struct {
+	ID    string
+	Name  string
+	Value string
+}
 
-	// Where your local node is running on localhost:5001
-	sh = shell.NewShell("https://ipfs.infura.io:5001")
-
-	fmt.Println("MMMMMMMMMMMMMMWX0kdlldk0XWMMMMMMMMMMMMMM\nMMMMMMMMMMWNKOxdoddooddodxOKNWMMMMMMMMMM\nMMMMMMMWX0kxdoddddddddddddodxk0XWMMMMMMM\nMMMWNKOxdoddddddddddddddddddddodxOKNWMMM\nMWKkdooddddddddddddddddddddddddddoodkKWM\nMNxcllloddddddddddddddddddddddddolllcxNM\nMNxooollllooddddddddddddddddoolllloooxNM\nMNxoddddoolllloodddddddddollllooddddoxNM\nMNxoddddddddolllllllllllllloddddddddoxNM\nMNxodddddddddddolcccccclodddddddddddoxNM\nMNxoddddddddddddolccccloddddddddddddoxNM\nMNxoddddddddddddddlcclddddddddddddddoxNM\nMNxoddddddddddddddoccoddddddddddddddoxNM\nMNxlodddddddddddddoccodddddddddddddolxNM\nMNklloddddddddddddoccoddddddddddddollkNM\nMMWX0kddddddddddddoccoddddddddddddk0XNMM\nMMMMMWN0OxdoddddddoccoddddddodxOKNWMMMMM\nMMMMMMMMWNXOkdodddoccodddodkOXNMMMMMMMMM\nMMMMMMMMMMMMWX0OxolccloxO0XWMMMMMMMMMMMM\nMMMMMMMMMMMMMMMWN0dlld0NWMMMMMMMMMMMMMMM\n")
-
-	fmt.Println("### ######  #######  #####  \n #  #     # #       #     # \n #  #     # #       #       \n #  ######  #####    #####  \n #  #       #             # \n #  #       #       #     # \n### #       #        #####  \n")
-
-	fmt.Println("###########################\n   Welcome to IPLD-CRUD!\n###########################\n")
-	fmt.Println("This client generates a dynamic key-value entry and stores it in IPFS!\n")
-
-	// Map structure to record key-value information
-	m := make(map[string]interface{})
-
+func createComplexMapping() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	fmt.Println("Enter value for the key field: ")
+	fmt.Println("Enter value for ID: ")
 	scanner.Scan()
-	inputKey := scanner.Text()
+	inputID := scanner.Text()
 
-	fmt.Println("Enter value for value field: ")
+	fmt.Println("Enter value for Name: ")
+	scanner.Scan()
+	inputName := scanner.Text()
+
+	fmt.Println("Enter value for Value: ")
 	scanner.Scan()
 	inputValue := scanner.Text()
 
-	m[inputKey] = inputValue
-
+	structObject := SampleStruct{inputID, inputName, inputValue}
 	// Converting into JSON object
-	entryJSON, err := json.Marshal(m)
+	entryJSON, err := json.Marshal(structObject)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -58,15 +53,51 @@ func main() {
 	}
 	fmt.Println("------\nOUTPUT\n------")
 	fmt.Printf("WRITE: Successfully added %sHere's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"), string(cid+"\n"))
+	updateMapping(inputID, cid)
 
-	// Fetch the details by reading the DAG for key "inputKey"
-	fmt.Printf("READ: Value for key \"%s\" is: ", inputKey)
-	res, err := GetDag(cid, inputKey)
+	// // Fetch the details by reading the DAG for key "inputKey"
+	// fmt.Printf("READ: Value for key \"%s\" is: ", inputKey)
+	// res, err := GetDag(cid, inputKey)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println(res)
+}
+
+func updateMapping(_structID, _CID string) {
+	// Map structure to record key-value information
+	m := make(map[string]interface{})
+	m[_structID] = _CID
+	// Converting into JSON object
+	mappingJSON, err := json.Marshal(m)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(res)
+	// Display the marshaled JSON object before sending it to IPFS
+	jsonStr := string(mappingJSON)
+	fmt.Println("The JSON object of the mapping is:")
+	fmt.Println(jsonStr)
 
+	// Dag PUT operation which will return the CID for futher access or pinning etc.
+	cid, err := sh.DagPut(mappingJSON, "json", "cbor")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s", err)
+		os.Exit(1)
+	}
+	fmt.Println("------\nOUTPUT\n------")
+	fmt.Printf("WRITE: Successfully added the mapping as well. Here's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"))
+}
+
+func main() {
+
+	// Where your local node is running on localhost:5001
+	sh = shell.NewShell("https://ipfs.infura.io:5001")
+
+	fmt.Println("MMMMMMMMMMMMMMWX0kdlldk0XWMMMMMMMMMMMMMM\nMMMMMMMMMMWNKOxdoddooddodxOKNWMMMMMMMMMM\nMMMMMMMWX0kxdoddddddddddddodxk0XWMMMMMMM\nMMMWNKOxdoddddddddddddddddddddodxOKNWMMM\nMWKkdooddddddddddddddddddddddddddoodkKWM\nMNxcllloddddddddddddddddddddddddolllcxNM\nMNxooollllooddddddddddddddddoolllloooxNM\nMNxoddddoolllloodddddddddollllooddddoxNM\nMNxoddddddddolllllllllllllloddddddddoxNM\nMNxodddddddddddolcccccclodddddddddddoxNM\nMNxoddddddddddddolccccloddddddddddddoxNM\nMNxoddddddddddddddlcclddddddddddddddoxNM\nMNxoddddddddddddddoccoddddddddddddddoxNM\nMNxlodddddddddddddoccodddddddddddddolxNM\nMNklloddddddddddddoccoddddddddddddollkNM\nMMWX0kddddddddddddoccoddddddddddddk0XNMM\nMMMMMWN0OxdoddddddoccoddddddodxOKNWMMMMM\nMMMMMMMMWNXOkdodddoccodddodkOXNMMMMMMMMM\nMMMMMMMMMMMMWX0OxolccloxO0XWMMMMMMMMMMMM\nMMMMMMMMMMMMMMMWN0dlld0NWMMMMMMMMMMMMMMM\n")
+	fmt.Println("### ######  #######  #####  \n #  #     # #       #     # \n #  #     # #       #       \n #  ######  #####    #####  \n #  #       #             # \n #  #       #       #     # \n### #       #        #####  \n")
+	fmt.Println("###########################\n   Welcome to IPLD-CRUD!\n###########################\n")
+	fmt.Println("This client generates a dynamic key-value entry and stores it in IPFS!\n")
+	createComplexMapping()
 }
 
 // GetDag handles READ operations of a DAG entry by CID, returning the corresponding value
