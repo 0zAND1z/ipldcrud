@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
+	"time"
 
 	shell "github.com/ipfs/go-ipfs-api"
 )
@@ -12,10 +14,39 @@ import (
 // Global variable to handle all the IPFS API client calls
 var sh *shell.Shell
 
+// ipfsURL is a constant string pointing to the IPFS API endpoint.
+// Use "https://ipfs.infura.io:5001" if you are not running ipfs daemon locally.
+const ipfsURL = "http://localhost:5001"
+
+// SampleStruct defines the benchmark payload
 type SampleStruct struct {
 	ID    string
 	Name  string
 	Value string
+}
+
+func writeEntry(entryData []byte) string {
+	cid, err := sh.DagPut(entryData, "json", "cbor")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s", err)
+		os.Exit(1)
+	}
+	return cid
+}
+
+func readSuperKey(superKeyCID, _nodeID string) {
+	// Fetch the details by ID
+	// start := time.Now()
+	fmt.Printf("READ: Value for key \"%s\" is: ", _nodeID)
+	res, err := GetDag(superKeyCID, _nodeID)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(res)
+	entryCID := fmt.Sprintf("%v", res)
+	queryDAG(entryCID, "Value")
+	// elapsed := time.Since(start)
+	// log.Printf("***IPLD GET OPERATION TOOK %s", elapsed)
 }
 
 func createComplexMapping() {
@@ -46,25 +77,24 @@ func createComplexMapping() {
 	fmt.Println(jsonStr)
 
 	// Dag PUT operation which will return the CID for futher access or pinning etc.
-	cid, err := sh.DagPut(entryJSON, "json", "cbor")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s", err)
-		os.Exit(1)
-	}
-	fmt.Println("------\nOUTPUT\n------")
-	fmt.Printf("WRITE: Successfully added %sHere's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"), string(cid+"\n"))
-	updateMapping(inputID, cid)
+	fmt.Println("------\nPUT OUTPUT\n------")
+	start := time.Now()
+	cid := writeEntry(entryJSON)
+	masterCID := updateMapping(inputID, cid)
+	elapsed := time.Since(start)
+	fmt.Println("masterCID: ", masterCID)
+	log.Printf("***IPLD PUT OPERATION TOOK %s", elapsed)
 
-	// // Fetch the details by reading the DAG for key "inputKey"
-	// fmt.Printf("READ: Value for key \"%s\" is: ", inputKey)
-	// res, err := GetDag(cid, inputKey)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(res)
+	fmt.Println("------\nGET OUTPUT\n------")
+	start = time.Now()
+	readSuperKey(masterCID, inputID)
+	elapsed = time.Since(start)
+	log.Printf("***IPLD GET OPERATION TOOK %s", elapsed)
+	// fmt.Printf("WRITE: Successfully added %sHere's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"), string(cid+"\n"))
+
 }
 
-func updateMapping(_structID, _CID string) {
+func updateMapping(_structID, _CID string) string {
 	// Map structure to record key-value information
 	m := make(map[string]interface{})
 	m[_structID] = _CID
@@ -79,23 +109,14 @@ func updateMapping(_structID, _CID string) {
 	fmt.Println(jsonStr)
 
 	// Dag PUT operation which will return the CID for futher access or pinning etc.
-	cid, err := sh.DagPut(mappingJSON, "json", "cbor")
+	masterCID, err := sh.DagPut(mappingJSON, "json", "cbor")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %s", err)
 		os.Exit(1)
 	}
-	fmt.Println("------\nOUTPUT\n------")
-	fmt.Printf("WRITE: Successfully added the mapping as well. Here's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(cid+"\n"))
-
-	// Fetch the details by ID
-	fmt.Printf("READ: Value for key \"%s\" is: ", _structID)
-	res, err := GetDag(cid, _structID)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(res)
-	cidofcid := fmt.Sprintf("%v", res)
-	queryDAG(cidofcid, "Value")
+	// fmt.Println("------\nOUTPUT\n------")
+	// fmt.Printf("WRITE: Successfully added the mapping as well. Here's the IPLD Explorer link: https://explore.ipld.io/#/explore/%s \n", string(masterCID+"\n"))
+	return masterCID
 }
 
 func queryDAG(_CID, _queryString string) {
@@ -111,7 +132,7 @@ func queryDAG(_CID, _queryString string) {
 func main() {
 
 	// Where your local node is running on localhost:5001
-	sh = shell.NewShell("https://ipfs.infura.io:5001")
+	sh = shell.NewShell(ipfsURL)
 
 	fmt.Println("MMMMMMMMMMMMMMWX0kdlldk0XWMMMMMMMMMMMMMM\nMMMMMMMMMMWNKOxdoddooddodxOKNWMMMMMMMMMM\nMMMMMMMWX0kxdoddddddddddddodxk0XWMMMMMMM\nMMMWNKOxdoddddddddddddddddddddodxOKNWMMM\nMWKkdooddddddddddddddddddddddddddoodkKWM\nMNxcllloddddddddddddddddddddddddolllcxNM\nMNxooollllooddddddddddddddddoolllloooxNM\nMNxoddddoolllloodddddddddollllooddddoxNM\nMNxoddddddddolllllllllllllloddddddddoxNM\nMNxodddddddddddolcccccclodddddddddddoxNM\nMNxoddddddddddddolccccloddddddddddddoxNM\nMNxoddddddddddddddlcclddddddddddddddoxNM\nMNxoddddddddddddddoccoddddddddddddddoxNM\nMNxlodddddddddddddoccodddddddddddddolxNM\nMNklloddddddddddddoccoddddddddddddollkNM\nMMWX0kddddddddddddoccoddddddddddddk0XNMM\nMMMMMWN0OxdoddddddoccoddddddodxOKNWMMMMM\nMMMMMMMMWNXOkdodddoccodddodkOXNMMMMMMMMM\nMMMMMMMMMMMMWX0OxolccloxO0XWMMMMMMMMMMMM\nMMMMMMMMMMMMMMMWN0dlld0NWMMMMMMMMMMMMMMM\n")
 	fmt.Println("### ######  #######  #####  \n #  #     # #       #     # \n #  #     # #       #       \n #  ######  #####    #####  \n #  #       #             # \n #  #       #       #     # \n### #       #        #####  \n")
