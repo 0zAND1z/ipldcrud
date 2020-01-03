@@ -1,6 +1,6 @@
 # ipld-crud
 
-A simple Golang based hack to experiment the uses of IPLD through the DAG operations using the [go-ipfs-api](github.com/ipfs/go-ipfs-api) package.
+A simple Golang based hack to experiment the uses of IPLD through the DAG operations using the [go-ipfs-api](https://github.com/ipfs/go-ipfs-api) package.
 
 I have built a tiny client that receives key-value entries from user and stores it on IPFS DAG, returning an explorable URL to play with.
 
