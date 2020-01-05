@@ -25,7 +25,7 @@ func main() {
 	fmt.Println("This client generates a dynamic key-value entry and stores it in IPFS!\n")
 
 	// Map structure to record key-value information
-	m := make(map[string]interface{})
+	keyValueMap := make(map[string]interface{})
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -37,10 +37,10 @@ func main() {
 	scanner.Scan()
 	inputValue := scanner.Text()
 
-	m[inputKey] = inputValue
+	keyValueMap[inputKey] = inputValue
 
 	// Converting into JSON object
-	entryJSON, err := json.Marshal(m)
+	entryJSON, err := json.Marshal(keyValueMap)
 	if err != nil {
 		fmt.Println(err)
 	}
