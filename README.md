@@ -11,3 +11,7 @@ Clone the repo and just run `go get && go run main.go`
 Once you run the main.go, a nice ASCII version of the IPFS logo pops up, asking you to enter a key and a value.
 
 After entering two string values, it will create a dag entry based on the input data and return back the hash along with the query results.
+
+### Tutorial
+
+For a more detailed understanding of IPLD and how the code works, check out this [article on SimpleAsWater.com](https://simpleaswater.com/hands-on-ipld-tutorial-in-golang/)!
