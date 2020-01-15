@@ -29,7 +29,7 @@ func main() {
 	fmt.Println("### ######  #######  #####  \n #  #     # #       #     # \n #  #     # #       #       \n #  ######  #####    #####  \n #  #       #             # \n #  #       #       #     # \n### #       #        #####  \n")
 
 	fmt.Println("###########################\n   Welcome to IPLD-CRUD!\n###########################\n")
-	fmt.Println("This client generates a dynamic key-value entry and stores it in IPFS!\n")
+	fmt.Println("This client generates docstore entries and stores it in IPFS!\n")
 
 	// Map structure to record key-value information
 	DocStoreMap := make(map[string]SampleStruct)
