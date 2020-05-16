@@ -6,11 +6,19 @@ I have built a tiny client that receives key-value entries from user and stores 
 
 ## Instructions
 
-Clone the repo and just run `go get && go run main.go`
+1. Clone the repo with the following command:
+```sh
+git clone git@github.com:0zAND1z/ipld-crud.git
+```
 
-Once you run the main.go, a nice ASCII version of the IPFS logo pops up, asking you to enter a key and a value.
+2. Run the program to initaite dialog:
+```sh
+go run main.go
+```
 
-After entering two string values, it will create a dag entry based on the input data and return back the hash along with the query results.
+3. Once you run the main.go, a nice ASCII version of the IPFS logo pops up, asking you to enter a key and a value.
+
+4. After entering two string values, it will create a dag entry based on the input data and return back the hash along with the query results.
 
 ### Tutorial
 
