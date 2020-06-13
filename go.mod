@@ -1,4 +1,4 @@
-module github.com/0zAND1z/ipld-crud
+module github.com/0zAND1z/ipldcrud
 
 go 1.14
 
