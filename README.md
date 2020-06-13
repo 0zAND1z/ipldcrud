@@ -8,7 +8,7 @@ I have built a tiny client that receives key-value entries from user and stores 
 
 1. Clone the repo with the following command:
 ```sh
-git clone git@github.com:0zAND1z/ipld-crud.git
+git clone git@github.com:0zAND1z/ipldcrud.git
 ```
 
 2. Run the program to initaite dialog:
