@@ -33,7 +33,7 @@ func InitShell(ipfsURL string) *shell.Shell {
 // }
 
 // Set writes key-value data
-func Set(sh *shell.Shell, data []byte) interface{} {
+func Set(sh *shell.Shell, data []byte) string {
 	// Dag PUT operation which will return the CID for futher access or pinning etc.
 	cid, err := sh.DagPut(data, "json", "cbor")
 	if err != nil {
